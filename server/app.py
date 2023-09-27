@@ -37,6 +37,17 @@ class Plants(Resource):
 
         return make_response(new_plant.to_dict(), 201)
 
+    def patch(self):
+        data = request.get_json()
+
+        new_price = Plant(
+            price=data['price'],
+        )
+
+        db.session.add(new_price)
+        db.session.commit()
+
+        return make_response(new_price.to_dict(), 201)
 
 api.add_resource(Plants, '/plants')
 
@@ -49,7 +60,18 @@ class PlantByID(Resource):
 
 
 api.add_resource(PlantByID, '/plants/<int:id>')
+class Plants(Resource):
 
+    def delete(self, id):
+        plant = Plant.query.get(id)
+
+        if not plant:
+            return make_response(jsonify({'error': 'Plant not found'}), 404)
+
+        db.session.delete(plant)
+        db.session.commit()
+
+        return make_response(jsonify({'message': 'Plant deleted successfully'}), 200)
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
